@@ -1,0 +1,22 @@
+-- 1. range of years that are represented in the data
+
+SELECT DISTINCT min(Year), max(year)
+FROM airfare
+
+
+
+-- shortest and longest-distanced flights, and between which 2 cities are they?
+
+
+SELECT  distinct city1, city2, max(nsmiles)
+FROM airfare
+UNION
+SELECT  distinct city1, city2, min(nsmiles)
+FROM airfare
+
+-- How many distinct cities are represented in the data --> NEED to find out how to join instead of union
+SELECT DISTINCT city1 as Cities
+FROM airfare
+UNION
+SELECT DISTINCT city2
+FROM airfare
