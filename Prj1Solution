@@ -20,3 +20,5 @@ FROM airfare
 UNION
 SELECT DISTINCT city2
 FROM airfare
+
+this is SQLite
