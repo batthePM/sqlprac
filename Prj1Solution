@@ -7,18 +7,52 @@ FROM airfare
 
 -- shortest and longest-distanced flights, and between which 2 cities are they?
 
+SELECT DISTINCT city1, city2, nsmiles AS miles
+FROM airfare
+WHERE nsmiles = (SELECT MIN(nsmiles) FROM airfare) OR
+       nsmiles = (SELECT MAX(nsmiles) FROM airfare);
+	   
+	   
+-- How many distinct cities are represented in the data
+select count(distinct a.city1) distinct_cities 
+from (select a.city1, a.city2
+	 from airfare a
+	 union
+	 select b.city1, b.city2 from airfare b) a;
+	 
+-- which airline appear most frequently as carrier with lowest fare (carrier_low) = WN
+select carrier_low, count(carrier_low)
+from airfare
+group by carrier_low
+order by count DESC
+limit 1;
 
-SELECT  distinct city1, city2, max(nsmiles)
-FROM airfare
-UNION
-SELECT  distinct city1, city2, min(nsmiles)
-FROM airfare
+-- airline with largest mkt share? = WN
+select carrier_lg, count(carrier_lg)
+from airfare
+group by carrier_lg
+order by count DESC
+limit 1;
 
--- How many distinct cities are represented in the data --> NEED to find out how to join instead of union
-SELECT DISTINCT city1 as Cities
-FROM airfare
-UNION
-SELECT DISTINCT city2
-FROM airfare
+-- how many instances are there where the carrier with the largest market share is not the carrier with the lowest fare? 
 
-this is SQLite
+select count(*) from airfare
+where carrier_low = carrier_lg
+AND carrier_low = 'WN'
+
+-- whats the avg difference in fare?
+
+select avg(fare - fare_low)
+from
+(select * from airfare
+where carrier_low = carrier_lg
+and carrier_low = 'WN') a
+
+-- whats the percent change in avg fare from 2007 to 2017 by flight? -->  take diff between the avg fare of 2007 and 2017, divide by avg in 2017 and * 100
+
+select distinct (select avg(fare) average from airfare
+where year = 2017
+group by year) - (select avg(fare) average from airfare
+where year = 2007
+group by year) difference
+from airfare
