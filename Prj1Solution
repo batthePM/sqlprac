@@ -50,9 +50,12 @@ and carrier_low = 'WN') a
 
 -- whats the percent change in avg fare from 2007 to 2017 by flight? -->  take diff between the avg fare of 2007 and 2017, divide by avg in 2017 and * 100
 
-with diff as (select distinct (select avg(fare) average from airfare
+with diff as 
+(select distinct (select avg(fare) average 
+from airfare
 where year = 2017
-group by year) - (select avg(fare) average from airfare
+group by year) - (select avg(fare) average 
+from airfare
 where year = 2007
 group by year) difference
 from airfare)
@@ -61,3 +64,41 @@ select difference/(select avg(fare) average from airfare
 where year = 2007
 group by year)*100 percentchange
 from diff
+
+
+--whats the average fare for each quarter per year? 
+
+WITH Q1 AS(select year, quarter, avg(fare) Q1avg 
+	from airfare
+	where quarter = 1
+	group by 1,2
+	order by 1),
+	
+	Q2 AS(select year, quarter, avg(fare) Q2avg
+	from airfare
+	where quarter = 2
+	group by 1,2
+	order by 1),
+	
+	Q3 AS(select year, quarter, avg(fare) Q3avg
+	from airfare
+	where quarter = 3
+	group by 1,2
+	order by 1),
+	
+	Q4 AS(select year, quarter, avg(fare) Q4avg
+	from airfare
+	where quarter = 4
+	group by 1,2
+	order by 1)
+	
+SELECT Q1.year, 
+	cast(Q1.Q1avg as int),cast(Q2.Q2avg as int), cast(Q3.Q3avg as int), cast(Q4.Q4avg as int)
+FROM Q1
+JOIN Q2
+	ON Q1.year = Q2.year
+JOIN Q3
+	ON Q2.year = Q3.year
+JOIN Q4
+	ON Q3.year = Q4.year
+	
